@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark text-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center text-primary mb-4">Employee List</h1>
+
+                <!-- Button to go back to the registration page -->
+                <div class="text-center mb-4">
+                    <button onclick="window.location.href='index.html'" class="btn btn-info w-100">Back to Registration</button>
+                </div>
+
+                <!-- Section to Display Employee List -->
+                <div id="employeeList" class="employee-list">
+                    <!-- Employee data will be dynamically inserted here -->
+                    <ul id="employeeUL" class="list-group">
+                        <!-- List items will appear here dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function loadEmployeeData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/employees');
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    const employeeList = result.data;
+                    const employeeListContainer = document.getElementById('employeeUL');
+                    employeeListContainer.innerHTML = ''; // Clear previous data
+
+                    employeeList.forEach(employee => {
+                        // Create a list item for each employee
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item', 'bg-secondary', 'text-light', 'mb-2', 'rounded');
+                        listItem.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <span><strong>${employee.name}</strong></span>
+                                <span>${employee.department}</span>
+                                <span>${employee.contact_number}</span>
+                            </div>
+                        `;
+
+                        // Append the list item to the container
+                        employeeListContainer.appendChild(listItem);
+                    });
+                } else {
+                    const noDataMessage = document.createElement('p');
+                    noDataMessage.textContent = 'No employees found.';
+                    employeeListContainer.appendChild(noDataMessage);
+                }
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = 'Error fetching employee data.';
+                document.getElementById('employeeList').appendChild(errorMessage);
+            }
+        }
+
+        // Load the employee data when the page loads
+        window.onload = loadEmployeeData;
+    </script>
+</body>
+</html>
