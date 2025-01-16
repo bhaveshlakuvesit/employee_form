@@ -1,0 +1,21 @@
+const pool = require('../db');
+
+async function registerEmployee(req, res) {
+    const { name, email, contact_number, department } = req.body;
+    
+    try {
+        const query = `
+            INSERT INTO Employee (name, email, contact_number, department)
+            VALUES ($1, $2, $3, $4) RETURNING *;
+        `;
+        const values = [name, email, contact_number, department];
+        const result = await pool.query(query, values);
+        
+        res.status(201).json({ message: "Employee registered successfully!", data: result.rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error registering employee!" });
+    }
+}
+
+module.exports = { registerEmployee };
